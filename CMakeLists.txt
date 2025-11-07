@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # replace the path below with the actual path
-set(SFML_LOCAL_DIR "C:/Libraries/SFML-2.6.2-windows-gcc-13.1.0-mingw-64-bit")
+set(SFML_LOCAL_DIR $ENV{SFML_GCC_2.6.2_DIR})
 
 set(SFML_DIR "${SFML_LOCAL_DIR}/lib/cmake/SFML")
 find_package(SFML 2.6.2 COMPONENTS graphics window system audio network REQUIRED)
