@@ -17,3 +17,12 @@ cmake -G "MinGW Makefiles" "-DCMAKE_TOOLCHAIN_FILE=../gcc-toolchain.cmake" -S ..
 cmake --build .
 ./simulator.exe
 ```
+
+Or
+```bash
+mkdir build ; if ($?) { cd build } ; if ($?) { cmake -G "MinGW Makefiles" "-DCMAKE_TOOLCHAIN_FILE=../gcc-toolchain.cmake" -S .. -B . } ; if ($?) { cmake --build . }; if ($?) { ./simulator.exe } ;
+```
+For subsequent runs
+```bash
+cmake --build . ; if ($?) { ./simulator.exe };
+```
