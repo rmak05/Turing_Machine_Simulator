@@ -11,6 +11,8 @@ set(SFML_LOCAL_DIR $ENV{SFML_GCC_2.6.2_DIR})
 set(SFML_DIR "${SFML_LOCAL_DIR}/lib/cmake/SFML")
 find_package(SFML 2.6.2 COMPONENTS graphics window system audio network REQUIRED)
 
+include_directories(include)
+
 set(EXECUTABLE_NAME simulator)
 add_executable(${EXECUTABLE_NAME}
     src/main.cpp
