@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include "helper.h"
+#include "helper.hpp"
+#include "turing_machine.hpp"
 
 int main(){
     greet();

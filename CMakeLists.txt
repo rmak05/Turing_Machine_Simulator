@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 4.1.2)
 
 project(TM_SIMULATOR)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # replace the path below with the actual path
@@ -16,6 +16,7 @@ include_directories(include)
 set(EXECUTABLE_NAME simulator)
 add_executable(${EXECUTABLE_NAME}
     src/main.cpp
+    src/turing_machine.cpp
     src/helper.cpp
 )
 
