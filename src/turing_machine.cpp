@@ -4,7 +4,7 @@
 std::set<move_direction> move_direction_set = {move_direction::left, move_direction::right, move_direction::stationary};
 
 turing_machine::turing_machine(const int _num_states, const std::set<char>& _input_alphabet, const std::set<char>& _tape_alphabet, const int _initial_state, const char _blank, const std::set<int>& _final_states) :
-num_states(_num_states), input_alphabet(_input_alphabet), tape_alphabet(_tape_alphabet), initial_state(_initial_state), blank(_blank), final_states(_final_states), transition_function(num_states), curr_state(initial_state){
+num_states(_num_states), input_alphabet(_input_alphabet), tape_alphabet(_tape_alphabet), initial_state(_initial_state), blank(_blank), final_states(_final_states), transition_function(num_states), curr_state(initial_state), read_head(0), tape({blank}), has_halted(false){
     if(!tape_alphabet.contains(blank)){
         throw std::runtime_error("Constraint Violation: Blank symbol should belong to the tape alphabet");
     }
@@ -41,4 +41,66 @@ void turing_machine::add_transition(const int _curr_state, const char _curr_symb
     }
 
     transition_function[_curr_state].emplace(_curr_symbol, std::make_tuple(_next_state, _new_symbol, _direction));
+}
+
+void turing_machine::setup(const std::string& _input){
+    for(const auto& symbol : _input){
+        if(!input_alphabet.contains(symbol)){
+            throw std::runtime_error("Constraint Violation: Symbols in the input string should belong to the input alphabet");
+        }
+    }
+    
+    curr_state = initial_state;
+
+    tape = std::deque<char>(_input.begin(), _input.end());
+    if(tape.empty()) tape.emplace_back(blank);
+
+    read_head = 0;
+
+    has_halted = false;
+}
+
+void turing_machine::reset(){
+    curr_state = initial_state;
+
+    tape = std::deque<char>({blank});
+
+    read_head = 0;
+
+    has_halted = false;
+}
+
+void turing_machine::make_move(){
+    if(!transition_function[curr_state].contains(tape[read_head])){
+        has_halted = true;
+        // throw std::runtime_error("Simulation Error: No transition defined for the current move");
+    }
+    const auto& move = transition_function[curr_state].at(tape[read_head]);
+
+    curr_state = std::get<int>(move);
+
+    tape[read_head] = std::get<char>(move);
+
+    move_direction direction = std::get<move_direction>(move);
+    if(direction == move_direction::left){
+        if(read_head == 0){
+            tape.emplace_front(blank);
+        }
+        else{
+            read_head--;
+        }
+    }
+    else if(direction == move_direction::right){
+        if(read_head == static_cast<int>(tape.size()) - 1){
+            tape.emplace_back(blank);
+        }
+        read_head++;
+    }
+    else if(direction == move_direction::stationary){
+        // do nothing
+    }
+}
+
+bool turing_machine::halted() const{
+    return has_halted;
 }

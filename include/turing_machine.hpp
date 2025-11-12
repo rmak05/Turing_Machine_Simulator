@@ -44,14 +44,20 @@ private:
     int                                 initial_state;
     char                                blank;
     std::set<int>                       final_states;
+
+    int                                 curr_state;
     std::deque<char>                    tape;
     int                                 read_head;
-    int                                 curr_state;
+    bool                                has_halted;
 
 public:
     turing_machine(const int _num_states, const std::set<char>& _input_alphabet, const std::set<char>& _tape_alphabet, const int _initial_state, const char _blank, const std::set<int>& _final_states);
 
     void add_transition(const int _curr_state, const char _curr_symbol, const int _next_state, const char _new_symbol, const move_direction _direction);
+    void setup(const std::string& _input);
+    void reset();
+    void make_move();
+    bool halted() const;
 };
 
 #endif /* TURING_MACHINE_HPP */
