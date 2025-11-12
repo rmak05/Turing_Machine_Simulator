@@ -8,7 +8,8 @@
 #include <deque>
 #include <tuple>
 
-constexpr int MINI_TAPE_SIZE = 9;         // MINI_TAPE_SIZE must be odd
+constexpr int MINI_TAPE_SIZE = 9;
+static_assert(MINI_TAPE_SIZE & 1, "Constraint Violation: MINI_TAPE_SIZE must be odd");
 
 enum class move_direction{
     left,
