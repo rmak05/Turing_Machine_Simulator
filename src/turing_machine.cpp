@@ -74,6 +74,8 @@ void turing_machine::make_move(){
     if(!transition_function[curr_state].contains(tape[read_head])){
         has_halted = true;
         // throw std::runtime_error("Simulation Error: No transition defined for the current move");
+
+        return;
     }
     const auto& move = transition_function[curr_state].at(tape[read_head]);
 
