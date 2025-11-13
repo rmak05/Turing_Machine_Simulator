@@ -3,6 +3,7 @@
 
 #include <array>
 #include <vector>
+#include <string>
 #include <map>
 #include <set>
 #include <deque>
@@ -14,10 +15,9 @@ static_assert(MINI_TAPE_SIZE & 1, "Constraint Violation: MINI_TAPE_SIZE must be 
 enum class move_direction{
     left,
     right,
-    stationary,
-    invalid
+    stationary
 };
-extern std::set<move_direction> move_direction_set;
+extern const std::set<move_direction> move_direction_set;
 
 /*
 Turing Machine:

@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include "turing_machine.hpp"
 
-std::set<move_direction> move_direction_set = {move_direction::left, move_direction::right, move_direction::stationary};
+const std::set<move_direction> move_direction_set = {move_direction::left, move_direction::right, move_direction::stationary};
 
 turing_machine::turing_machine(const int _num_states, const std::set<char>& _input_alphabet, const std::set<char>& _tape_alphabet, const int _initial_state, const char _blank, const std::set<int>& _final_states) :
 num_states(_num_states), input_alphabet(_input_alphabet), tape_alphabet(_tape_alphabet), initial_state(_initial_state), blank(_blank), final_states(_final_states), transition_function(num_states), curr_state(initial_state), read_head(0), tape({blank}){
