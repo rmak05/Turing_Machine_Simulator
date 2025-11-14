@@ -8,9 +8,7 @@
 #include <set>
 #include <deque>
 #include <tuple>
-
-constexpr int MINI_TAPE_SIZE = 9;
-static_assert(MINI_TAPE_SIZE & 1, "Constraint Violation: MINI_TAPE_SIZE must be odd");
+#include "constants.hpp"
 
 enum class move_direction{
     left,
@@ -53,7 +51,10 @@ private:
     std::deque<char>                    tape;
     int                                 read_head;
 
+    void validate_contraints();
+
 public:
+    turing_machine();
     turing_machine(const int _num_states, const std::set<char>& _input_alphabet, const std::set<char>& _tape_alphabet, const int _initial_state, const char _blank, const std::set<int>& _final_states);
 
     void add_transition(const int _curr_state, const char _curr_symbol, const int _next_state, const char _new_symbol, const move_direction _direction);

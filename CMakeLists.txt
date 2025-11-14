@@ -17,6 +17,8 @@ set(EXECUTABLE_NAME simulator)
 add_executable(${EXECUTABLE_NAME}
     src/main.cpp
     src/turing_machine.cpp
+    src/simulator.cpp
+    src/tape_box.cpp
 )
 
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE

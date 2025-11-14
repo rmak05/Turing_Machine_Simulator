@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "turing_machine.hpp"
+#include "simulator.hpp"
 
 void demo_window(){
     sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
@@ -25,35 +26,40 @@ void demo_window(){
 }
 
 void demo_tm(){
-    turing_machine tm(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
-    tm.add_transition(0, '0', 1, 'x', move_direction::right);
-    tm.add_transition(0, 'y', 3, 'y', move_direction::right);
-    tm.add_transition(1, '0', 1, '0', move_direction::right);
-    tm.add_transition(1, '1', 2, 'y', move_direction::left);
-    tm.add_transition(1, 'y', 1, 'y', move_direction::right);
-    tm.add_transition(2, '0', 2, '0', move_direction::left);
-    tm.add_transition(2, 'x', 0, 'x', move_direction::right);
-    tm.add_transition(2, 'y', 2, 'y', move_direction::left);
-    tm.add_transition(3, 'y', 3, 'y', move_direction::right);
-    tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
+    // turing_machine tm;
+    // turing_machine tm1(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
+    // tm = tm1;
+    // tm.add_transition(0, '0', 1, 'x', move_direction::right);
+    // tm.add_transition(0, 'y', 3, 'y', move_direction::right);
+    // tm.add_transition(1, '0', 1, '0', move_direction::right);
+    // tm.add_transition(1, '1', 2, 'y', move_direction::left);
+    // tm.add_transition(1, 'y', 1, 'y', move_direction::right);
+    // tm.add_transition(2, '0', 2, '0', move_direction::left);
+    // tm.add_transition(2, 'x', 0, 'x', move_direction::right);
+    // tm.add_transition(2, 'y', 2, 'y', move_direction::left);
+    // tm.add_transition(3, 'y', 3, 'y', move_direction::right);
+    // tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
 
-    auto print_array = [](const std::array<char, MINI_TAPE_SIZE>& _arr){
-        for(auto itr : _arr) std::cout << itr << ' ';
-        std::cout << std::endl;
-    };
+    // auto print_array = [](const std::array<char, MINI_TAPE_SIZE>& _arr){
+    //     for(auto itr : _arr) std::cout << itr << ' ';
+    //     std::cout << std::endl;
+    // };
 
-    tm.setup("0011");
-    print_array(tm.get_mini_tape_contents());
-    while(!tm.halted()){
-        tm.make_move();
-        print_array(tm.get_mini_tape_contents());
-    }
-    if(tm.accepting()){
-        std::cout << "Accepted" << std::endl;
-    }
-    else{
-        std::cout << "Rejected" << std::endl;
-    }
+    // tm.setup("0011");
+    // // print_array(tm.get_mini_tape_contents());
+    // while(!tm.halted()){
+    //     tm.make_move();
+    //     // print_array(tm.get_mini_tape_contents());
+    // }
+    // if(tm.accepting()){
+    //     std::cout << "Accepted" << std::endl;
+    // }
+    // else{
+    //     std::cout << "Rejected" << std::endl;
+    // }
+
+    simulator sim;
+    sim.simulate_turing_machine();
 }
 
 int main(){
