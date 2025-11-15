@@ -1,10 +1,19 @@
 #include <stdexcept>
 #include "turing_machine.hpp"
 
-std::set<move_direction> move_direction_set = {move_direction::left, move_direction::right, move_direction::stationary};
+const std::set<move_direction> move_direction_set = {move_direction::left, move_direction::right, move_direction::stationary};
+
+turing_machine::turing_machine() :
+num_states(1), tape_alphabet({' '}), initial_state(0), blank(' '), final_states({0}), transition_function(1), curr_state(0), read_head(0), tape({' '}){
+    validate_contraints();
+}
 
 turing_machine::turing_machine(const int _num_states, const std::set<char>& _input_alphabet, const std::set<char>& _tape_alphabet, const int _initial_state, const char _blank, const std::set<int>& _final_states) :
-num_states(_num_states), input_alphabet(_input_alphabet), tape_alphabet(_tape_alphabet), initial_state(_initial_state), blank(_blank), final_states(_final_states), transition_function(num_states), curr_state(initial_state), read_head(0), tape({blank}){
+num_states(_num_states), input_alphabet(_input_alphabet), tape_alphabet(_tape_alphabet), initial_state(_initial_state), blank(_blank), final_states(_final_states), transition_function(_num_states), curr_state(_initial_state), read_head(0), tape({_blank}){
+    validate_contraints();
+}
+
+void turing_machine::validate_contraints(){
     if(!tape_alphabet.contains(blank)){
         throw std::runtime_error("Constraint Violation: Blank symbol should belong to the tape alphabet");
     }
@@ -77,9 +86,9 @@ bool turing_machine::accepting() const{
     return halted() && final_states.contains(curr_state);
 }
 
-void turing_machine::make_move(){
+std::tuple<int, char, move_direction> turing_machine::make_move(){
     if(halted()){
-        return;
+        return std::make_tuple(-1, blank, move_direction::stationary);
     }
     const auto& move = transition_function[curr_state].at(tape[read_head]);
 
@@ -105,6 +114,8 @@ void turing_machine::make_move(){
     else if(direction == move_direction::stationary){
         // do nothing
     }
+
+    return move;
 }
 
 std::array<char, MINI_TAPE_SIZE> turing_machine::get_mini_tape_contents() const{

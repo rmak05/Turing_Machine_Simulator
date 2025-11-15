@@ -3,21 +3,19 @@
 
 #include <array>
 #include <vector>
+#include <string>
 #include <map>
 #include <set>
 #include <deque>
 #include <tuple>
-
-constexpr int MINI_TAPE_SIZE = 9;
-static_assert(MINI_TAPE_SIZE & 1, "Constraint Violation: MINI_TAPE_SIZE must be odd");
+#include "constants.hpp"
 
 enum class move_direction{
     left,
     right,
-    stationary,
-    invalid
+    stationary
 };
-extern std::set<move_direction> move_direction_set;
+extern const std::set<move_direction> move_direction_set;
 
 /*
 Turing Machine:
@@ -53,7 +51,10 @@ private:
     std::deque<char>                    tape;
     int                                 read_head;
 
+    void validate_contraints();
+
 public:
+    turing_machine();
     turing_machine(const int _num_states, const std::set<char>& _input_alphabet, const std::set<char>& _tape_alphabet, const int _initial_state, const char _blank, const std::set<int>& _final_states);
 
     void add_transition(const int _curr_state, const char _curr_symbol, const int _next_state, const char _new_symbol, const move_direction _direction);
@@ -61,7 +62,7 @@ public:
     void reset();
     bool halted() const;
     bool accepting() const;
-    void make_move();
+    std::tuple<int, char, move_direction> make_move();
     std::array<char, MINI_TAPE_SIZE> get_mini_tape_contents() const;
 
     void export_to_graphviz(const std::string& filename) const {};
