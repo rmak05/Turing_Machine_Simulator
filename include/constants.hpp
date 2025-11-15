@@ -11,6 +11,7 @@ inline constexpr const char *INPUT_STRING_FILE_PATH     = "../input/input_string
 inline constexpr const char *TAPE_FONT_PATH             = "../res/fonts/NotoSans_Regular.ttf";
 inline constexpr const char *TAPE_TEXTURE_PATH          = "../res/textures/tape_box_3.png";
 inline constexpr const char *TAPE_CENTER_TEXTURE_PATH   = "../res/textures/tape_box_5.png";
+inline constexpr const char *READ_HEAD_TEXTURE          = "../res/textures/read_head_0.png";
 
 inline constexpr float TAPE_BOX_SIZE            = 100.0f;
 inline constexpr unsigned TAPE_BOX_TEXT_SIZE    = 45u;

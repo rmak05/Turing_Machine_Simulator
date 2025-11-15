@@ -44,6 +44,10 @@ void simulator::simulate_turing_machine() const{
     if(!tape_center_texture.loadFromFile(TAPE_CENTER_TEXTURE_PATH)){
         throw std::runtime_error("Failed to load the tape texture");
     }
+    sf::Texture read_head_texture;
+    if(!read_head_texture.loadFromFile(READ_HEAD_TEXTURE)){
+        throw std::runtime_error("Failed to load the tape texture");
+    }
 
     std::vector<tape_box> tape_boxes;
     float base_xpos = 200.0f, base_ypos = 600.0f;
@@ -69,6 +73,11 @@ void simulator::simulate_turing_machine() const{
     center_box.setTexture(&tape_center_texture);
     center_box.setOrigin(center_box.getSize() / 2.0f);
     center_box.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos);
+
+    sf::RectangleShape read_head(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
+    read_head.setTexture(&read_head_texture);
+    read_head.setOrigin(read_head.getSize() / 2.0f);
+    read_head.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos + TAPE_BOX_SIZE);
 
     long long frame_count = -1ll;
     std::tuple<int, char, move_direction> move;
@@ -133,6 +142,7 @@ void simulator::simulate_turing_machine() const{
             simulation_window.draw(dummy_boxes[i]);
         }
         simulation_window.draw(center_box);
+        simulation_window.draw(read_head);
         simulation_window.display();
     }
 
