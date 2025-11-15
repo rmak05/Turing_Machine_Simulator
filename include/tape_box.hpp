@@ -8,6 +8,7 @@ private:
     sf::RectangleShape  box;
     sf::Text            text;
     sf::Vector2f        position;
+    sf::Vector2f        velocity;
 
 public:
     tape_box();
@@ -15,6 +16,9 @@ public:
 
     void draw(sf::RenderWindow& _window) const;
     void set_text(const char _text);
+    void set_position(const float _xpos, const float _ypos);
+    void set_velocity(const float _xv, const float _yv);
+    void transform();
 };
 
 #endif /* TAPE_BOX_HPP */

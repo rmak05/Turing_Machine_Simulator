@@ -38,14 +38,25 @@ void simulator::simulate_turing_machine() const{
     }
 
     std::vector<tape_box> tape_boxes;
-    float xpos = 300.0f, ypos = 200.0f;
+    float xpos = 200.0f, ypos = 200.0f;
     auto mini_tape_contents = tm.get_mini_tape_contents();
     for(int i = 0; i < MINI_TAPE_SIZE; i++){
         tape_boxes.emplace_back(mini_tape_contents[i], tape_font, xpos, ypos);
         xpos += TAPE_BOX_SIZE;
     }
+    
+    std::vector<sf::RectangleShape> dummy_boxes;
+    for(int i = 0; i < 4; i++){
+        dummy_boxes.emplace_back(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
+        dummy_boxes[i].setOrigin(dummy_boxes[i].getSize() / 2.0f);
+    }
+    dummy_boxes[0].setPosition(200.0f, 200.0f);
+    dummy_boxes[1].setPosition(200.0f - TAPE_BOX_SIZE, 200.0f);
+    dummy_boxes[2].setPosition(200.0f + (MINI_TAPE_SIZE - 1) * TAPE_BOX_SIZE, 200.0f);
+    dummy_boxes[3].setPosition(200.0f + MINI_TAPE_SIZE * TAPE_BOX_SIZE, 200.0f);
 
-    long long frame_count = 0ll;
+    long long frame_count = -1ll;
+    std::tuple<int, char, move_direction> move;
 
     while(simulation_window.isOpen()){
         frame_count++;
@@ -56,22 +67,57 @@ void simulator::simulate_turing_machine() const{
             if(event.type == sf::Event::Closed) simulation_window.close();
         }
 
-        simulation_window.clear();
-        for(auto& box : tape_boxes){
-            box.draw(simulation_window);
+        // for(int i = 0; i < MINI_TAPE_SIZE; i++){
+        //     tape_boxes[i].transform();
+        // }
+
+        if(frame_count % 120 == 0){
+            for(int i = 0; i < MINI_TAPE_SIZE; i++){
+                tape_boxes[i].set_velocity(0.0f, 0.0f);
+            }
         }
-        simulation_window.display();
-
-        if(frame_count % 60 == 0){
+        if(frame_count % 120 == 30){
             if(!tm.halted()){
-                tm.make_move();
-
                 mini_tape_contents = tm.get_mini_tape_contents();
+
+                move = tm.make_move();
+
+                xpos = 200.0f;
+                ypos = 200.0f;
                 for(int i = 0; i < MINI_TAPE_SIZE; i++){
-                    tape_boxes[i].set_text(mini_tape_contents[i]);
+                    if(i == MINI_TAPE_SIZE / 2) tape_boxes[i].set_text(std::get<char>(move));
+                    else tape_boxes[i].set_text(mini_tape_contents[i]);
+
+                    tape_boxes[i].set_position(xpos, ypos);
+                    xpos += TAPE_BOX_SIZE;
                 }
             }
         }
+        else if(frame_count % 120 == 60){
+            if(std::get<move_direction>(move) == move_direction::left){
+                for(int i = 0; i < MINI_TAPE_SIZE; i++){
+                    tape_boxes[i].set_velocity(TAPE_BOX_SIZE / 60, 0.0f);
+                }
+            }
+            else if(std::get<move_direction>(move) == move_direction::right){
+                for(int i = 0; i < MINI_TAPE_SIZE; i++){
+                    tape_boxes[i].set_velocity(-TAPE_BOX_SIZE / 60, 0.0f);
+                }
+            }
+        }
+
+        for(int i = 0; i < MINI_TAPE_SIZE; i++){
+            tape_boxes[i].transform();
+        }
+
+        simulation_window.clear(BG_COLOR);
+        for(auto& box : tape_boxes){
+            box.draw(simulation_window);
+        }
+        for(int i = 0; i < 4; i++){
+            simulation_window.draw(dummy_boxes[i]);
+        }
+        simulation_window.display();
     }
 
     if(tm.accepting()){

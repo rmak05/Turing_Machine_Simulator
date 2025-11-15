@@ -62,7 +62,7 @@ public:
     void reset();
     bool halted() const;
     bool accepting() const;
-    void make_move();
+    std::tuple<int, char, move_direction> make_move();
     std::array<char, MINI_TAPE_SIZE> get_mini_tape_contents() const;
 };
 

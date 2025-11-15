@@ -86,9 +86,9 @@ bool turing_machine::accepting() const{
     return halted() && final_states.contains(curr_state);
 }
 
-void turing_machine::make_move(){
+std::tuple<int, char, move_direction> turing_machine::make_move(){
     if(halted()){
-        return;
+        return std::make_tuple(-1, blank, move_direction::stationary);
     }
     const auto& move = transition_function[curr_state].at(tape[read_head]);
 
@@ -114,6 +114,8 @@ void turing_machine::make_move(){
     else if(direction == move_direction::stationary){
         // do nothing
     }
+
+    return move;
 }
 
 std::array<char, MINI_TAPE_SIZE> turing_machine::get_mini_tape_contents() const{
