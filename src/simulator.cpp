@@ -33,15 +33,24 @@ void simulator::simulate_turing_machine() const{
     simulation_window.setFramerateLimit(60);
 
     sf::Font tape_font;
-    if(!tape_font.loadFromFile("../res/fonts/NotoSans_Regular.ttf")){
+    if(!tape_font.loadFromFile(TAPE_FONT_PATH)){
         throw std::runtime_error("Failed to load the tape font");
+    }
+    sf::Texture tape_texture;
+    if(!tape_texture.loadFromFile(TAPE_TEXTURE_PATH)){
+        throw std::runtime_error("Failed to load the tape texture");
+    }
+    sf::Texture tape_center_texture;
+    if(!tape_center_texture.loadFromFile(TAPE_CENTER_TEXTURE_PATH)){
+        throw std::runtime_error("Failed to load the tape texture");
     }
 
     std::vector<tape_box> tape_boxes;
-    float xpos = 200.0f, ypos = 200.0f;
+    float base_xpos = 200.0f, base_ypos = 600.0f;
+    float xpos = base_xpos, ypos = base_ypos;
     auto mini_tape_contents = tm.get_mini_tape_contents();
     for(int i = 0; i < MINI_TAPE_SIZE; i++){
-        tape_boxes.emplace_back(mini_tape_contents[i], tape_font, xpos, ypos);
+        tape_boxes.emplace_back(mini_tape_contents[i], tape_font, &tape_texture, xpos, ypos);
         xpos += TAPE_BOX_SIZE;
     }
     
@@ -49,11 +58,17 @@ void simulator::simulate_turing_machine() const{
     for(int i = 0; i < 4; i++){
         dummy_boxes.emplace_back(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
         dummy_boxes[i].setOrigin(dummy_boxes[i].getSize() / 2.0f);
+        dummy_boxes[i].setFillColor(BG_COLOR);
     }
-    dummy_boxes[0].setPosition(200.0f, 200.0f);
-    dummy_boxes[1].setPosition(200.0f - TAPE_BOX_SIZE, 200.0f);
-    dummy_boxes[2].setPosition(200.0f + (MINI_TAPE_SIZE - 1) * TAPE_BOX_SIZE, 200.0f);
-    dummy_boxes[3].setPosition(200.0f + MINI_TAPE_SIZE * TAPE_BOX_SIZE, 200.0f);
+    dummy_boxes[0].setPosition(base_xpos, base_ypos);
+    dummy_boxes[1].setPosition(base_xpos - TAPE_BOX_SIZE, base_ypos);
+    dummy_boxes[2].setPosition(base_xpos + (MINI_TAPE_SIZE - 1) * TAPE_BOX_SIZE, base_ypos);
+    dummy_boxes[3].setPosition(base_xpos + MINI_TAPE_SIZE * TAPE_BOX_SIZE, base_ypos);
+
+    sf::RectangleShape center_box(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
+    center_box.setTexture(&tape_center_texture);
+    center_box.setOrigin(center_box.getSize() / 2.0f);
+    center_box.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos);
 
     long long frame_count = -1ll;
     std::tuple<int, char, move_direction> move;
@@ -82,8 +97,8 @@ void simulator::simulate_turing_machine() const{
 
                 move = tm.make_move();
 
-                xpos = 200.0f;
-                ypos = 200.0f;
+                xpos = base_xpos;
+                ypos = base_ypos;
                 for(int i = 0; i < MINI_TAPE_SIZE; i++){
                     if(i == MINI_TAPE_SIZE / 2) tape_boxes[i].set_text(std::get<char>(move));
                     else tape_boxes[i].set_text(mini_tape_contents[i]);
@@ -117,6 +132,7 @@ void simulator::simulate_turing_machine() const{
         for(int i = 0; i < 4; i++){
             simulation_window.draw(dummy_boxes[i]);
         }
+        simulation_window.draw(center_box);
         simulation_window.display();
     }
 

@@ -4,18 +4,17 @@
 
 tape_box::tape_box(){}
 
-tape_box::tape_box(const char _text, const sf::Font& _font, const float _xpos, const float _ypos) :
+tape_box::tape_box(const char _text, const sf::Font& _font, const sf::Texture *_texture, const float _xpos, const float _ypos) :
 box(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE)), text(_text, _font), position(_xpos, _ypos){
+    box.setTexture(_texture);
     box.setOrigin(box.getSize() / 2.0f);
-    box.setFillColor(sf::Color::Green);
     box.setPosition(position);
-    box.setOutlineColor(sf::Color::Magenta);
-    box.setOutlineThickness(5.0f);
     
+    text.setCharacterSize(TAPE_BOX_TEXT_SIZE);
     sf::FloatRect text_bounds = text.getLocalBounds();
     text.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);
     text.setPosition(position);
-    text.setFillColor(sf::Color::Red);
+    text.setFillColor(TAPE_TEXT_COLOR);
 }
 
 void tape_box::draw(sf::RenderWindow& _window) const{
