@@ -45,11 +45,15 @@ bool simulator::simulate_turing_machine() const{
     }
     sf::Texture tape_center_texture;
     if(!tape_center_texture.loadFromFile(TAPE_CENTER_TEXTURE_PATH)){
-        throw std::runtime_error("Failed to load the tape texture");
+        throw std::runtime_error("Failed to load the tape center texture");
     }
     sf::Texture read_head_texture;
     if(!read_head_texture.loadFromFile(READ_HEAD_TEXTURE)){
-        throw std::runtime_error("Failed to load the tape texture");
+        throw std::runtime_error("Failed to load the read head texture");
+    }
+    sf::Texture fa_texture;
+    if(!fa_texture.loadFromFile(TM_FA_IMAGE_PATH)){
+        throw std::runtime_error("Failed to load the FA texture");
     }
 
     std::vector<tape_box> tape_boxes;
@@ -82,6 +86,13 @@ bool simulator::simulate_turing_machine() const{
     read_head.setOrigin(read_head.getSize() / 2.0f);
     read_head.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos + TAPE_BOX_SIZE);
 
+    sf::RectangleShape tm_fa(sf::Vector2f(1000.0f, 570.0f));
+    tm_fa.setTexture(&fa_texture);
+    tm_fa.setOrigin(tm_fa.getSize() / 2.0f);
+    tm_fa.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos + 450.0f);
+    tm_fa.setOutlineColor(FA_BOX_OUTLINE_COLOR);
+    tm_fa.setOutlineThickness(8.0f);
+
     long long frame_count = -1ll;
     std::tuple<int, char, move_direction> move;
     bool paused = true;
@@ -96,6 +107,7 @@ bool simulator::simulate_turing_machine() const{
     }
     simulation_window.draw(center_box);
     simulation_window.draw(read_head);
+    simulation_window.draw(tm_fa);
     simulation_window.display();
 
     while(simulation_window.isOpen()){
@@ -138,6 +150,18 @@ bool simulator::simulate_turing_machine() const{
         }
 
         if(paused){
+            simulation_window.clear(BG_COLOR);
+            for(auto& box : tape_boxes){
+                box.draw(simulation_window);
+            }
+            for(int i = 0; i < 4; i++){
+                simulation_window.draw(dummy_boxes[i]);
+            }
+            simulation_window.draw(center_box);
+            simulation_window.draw(read_head);
+            simulation_window.draw(tm_fa);
+            simulation_window.display();
+
             continue;
         }
 
@@ -163,6 +187,12 @@ bool simulator::simulate_turing_machine() const{
                     tape_boxes[i].set_position(xpos, ypos);
                     xpos += TAPE_BOX_SIZE;
                 }
+
+                tm.export_to_graphviz(DOT_FILE_PATH);
+                if(!fa_texture.loadFromFile(TM_FA_IMAGE_PATH)){
+                    throw std::runtime_error("Failed to load the FA texture");
+                }
+                tm_fa.setTexture(&fa_texture);
             }
             else if(!verdict_passed){
                 verdict_passed = true;
@@ -205,6 +235,7 @@ bool simulator::simulate_turing_machine() const{
         }
         simulation_window.draw(center_box);
         simulation_window.draw(read_head);
+        simulation_window.draw(tm_fa);
         simulation_window.display();
     }
 

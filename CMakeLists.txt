@@ -19,7 +19,6 @@ add_executable(${EXECUTABLE_NAME}
     src/turing_machine.cpp
     src/simulator.cpp
     src/tape_box.cpp
-    src/graph.cpp
 )
 
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE
