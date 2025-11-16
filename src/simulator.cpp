@@ -29,8 +29,9 @@ bool simulator::simulate_turing_machine() const{
 
     tm.setup(input_string);
 
+    unsigned fps = 60u;
     sf::RenderWindow simulation_window(sf::VideoMode(1400u, 850u), "Turing Machine Simulator");
-    simulation_window.setFramerateLimit(60);
+    simulation_window.setFramerateLimit(fps);
 
     sf::Font tape_font;
     if(!tape_font.loadFromFile(TAPE_FONT_PATH)){
@@ -82,6 +83,7 @@ bool simulator::simulate_turing_machine() const{
     long long frame_count = -1ll;
     std::tuple<int, char, move_direction> move;
     bool paused = true;
+    bool verdict_passed = false;
 
     simulation_window.clear(BG_COLOR);
     for(auto& box : tape_boxes){
@@ -112,6 +114,14 @@ bool simulator::simulate_turing_machine() const{
                     else if(event.key.code == sf::Keyboard::R){
                         return true;
                     }
+                    else if(event.key.code == sf::Keyboard::F){
+                        fps = std::min(180u, fps + 60u);
+                        simulation_window.setFramerateLimit(fps);
+                    }
+                    else if(event.key.code == sf::Keyboard::S){
+                        fps = std::max(60u, fps - 60u);
+                        simulation_window.setFramerateLimit(fps);
+                    }
                     else if(event.key.code == sf::Keyboard::Escape){
                         simulation_window.close();
                     }
@@ -130,10 +140,6 @@ bool simulator::simulate_turing_machine() const{
         }
 
         frame_count++;
-
-        // for(int i = 0; i < MINI_TAPE_SIZE; i++){
-        //     tape_boxes[i].transform();
-        // }
 
         if(frame_count % 120 == 0){
             for(int i = 0; i < MINI_TAPE_SIZE; i++){
@@ -156,6 +162,16 @@ bool simulator::simulate_turing_machine() const{
                     xpos += TAPE_BOX_SIZE;
                 }
             }
+            else if(!verdict_passed){
+                verdict_passed = true;
+
+                if(tm.accepting()){
+                    std::cout << "Accepted" << std::endl;
+                }
+                else{
+                    std::cout << "Rejected" << std::endl;
+                }
+            }
         }
         else if(frame_count % 120 == 60){
             if(std::get<move_direction>(move) == move_direction::left){
@@ -167,6 +183,10 @@ bool simulator::simulate_turing_machine() const{
                 for(int i = 0; i < MINI_TAPE_SIZE; i++){
                     tape_boxes[i].set_velocity(-TAPE_BOX_SIZE / 60, 0.0f);
                 }
+            }
+
+            if(tm.halted()){
+                std::get<move_direction>(move) = move_direction::stationary;
             }
         }
 
@@ -186,12 +206,12 @@ bool simulator::simulate_turing_machine() const{
         simulation_window.display();
     }
 
-    if(tm.accepting()){
-        std::cout << "Accepted" << std::endl;
-    }
-    else{
-        std::cout << "Rejected" << std::endl;
-    }
+    // if(tm.accepting()){
+    //     std::cout << "Accepted" << std::endl;
+    // }
+    // else{
+    //     std::cout << "Rejected" << std::endl;
+    // }
 
     input_string_file.close();
 
