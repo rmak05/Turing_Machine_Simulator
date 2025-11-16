@@ -9,12 +9,12 @@
 const std::set<move_direction> move_direction_set = {move_direction::left, move_direction::right, move_direction::stationary};
 
 turing_machine::turing_machine() :
-num_states(1), tape_alphabet({' '}), initial_state(0), blank(' '), final_states({0}), transition_function(1), curr_state(0), read_head(0), tape({' '}){
+num_states(1), tape_alphabet({' '}), initial_state(0), blank(' '), final_states({0}), transition_function(1), curr_state(0), read_head(0), tape({' '}), extracted_to_dot(false){
     validate_contraints();
 }
 
 turing_machine::turing_machine(const int _num_states, const std::set<char>& _input_alphabet, const std::set<char>& _tape_alphabet, const int _initial_state, const char _blank, const std::set<int>& _final_states) :
-num_states(_num_states), input_alphabet(_input_alphabet), tape_alphabet(_tape_alphabet), initial_state(_initial_state), blank(_blank), final_states(_final_states), transition_function(_num_states), curr_state(_initial_state), read_head(0), tape({_blank}){
+num_states(_num_states), input_alphabet(_input_alphabet), tape_alphabet(_tape_alphabet), initial_state(_initial_state), blank(_blank), final_states(_final_states), transition_function(_num_states), curr_state(_initial_state), read_head(0), tape({_blank}), extracted_to_dot(false){
     validate_contraints();
 }
 
@@ -147,83 +147,117 @@ std::array<char, MINI_TAPE_SIZE> turing_machine::get_mini_tape_contents() const{
     return mini_tape;
 }
 
-void turing_machine::export_to_graphviz(const std::string& filename) const {
-    std::ofstream dot(filename);
-    if (!dot) {
-        std::cerr << "ERROR: Cannot open " << filename << " for writing\n";
-    }
+void turing_machine::export_to_graphviz(const std::string& filename){
+    if(!extracted_to_dot){
+        extracted_to_dot = true;
 
-    dot << "digraph TuringMachine {\n";
-    dot << "bgcolor=\"lightyellow\";\n";
-    dot << "  rankdir=LR;\n";
-    dot << "  fontsize=14;\n";
-    dot << "  node [shape=circle, fontname=Helvetica];\n";
-
-    dot << R"(
-  subgraph cluster_legend {
-    label="Legend";
-    fontsize=15;
-    style=dashed;
-    margin=8;
-    rank=sink;
-
-    Lmove [label="L = Move Left", shape=plaintext, fontcolor=red];
-    Rmove [label="R = Move Right", shape=plaintext, fontcolor=blue];
-    Smove [label="S = Stay", shape=plaintext, fontcolor="#4c525c"];
-    Curr [label="Current State", shape=circle, style=filled, fillcolor=lightgreen, fontsize=8];
-
-    // Invisible edges for vertical stacking
-    Lmove -> Rmove [style=invis];
-    Rmove -> Smove [style=invis];
-    Smove -> Curr  [style=invis];
-  }
-)";
-
-    for (int f : final_states) {
-        dot << "  " << f << " [shape=doublecircle];\n";
-    }
-
-    dot << "  start [shape=point];\n";
-    dot << "  start -> " << initial_state << ";\n";
-
-    dot << "  " << curr_state << " [style=filled, fillcolor=lightgreen];\n";
-
-    auto direction_to_string = [](move_direction dir) {
-        switch(dir) {
-            case move_direction::left: return "L";
-            case move_direction::right: return "R";
-            case move_direction::stationary: return "S";
-            default: return "?";
+        std::ofstream dot(filename);
+        if (!dot) {
+            std::cerr << "ERROR: Cannot open " << filename << " for writing\n";
         }
-    };
-
-    for (int state = 0; state < num_states; ++state) {
-        for (const auto& [read_symbol, trans] : transition_function[state]) {
-            int next_state;
-            char write_symbol;
-            move_direction dir;
-            std::tie(next_state, write_symbol, dir) = trans;
-
-            std::string color;
-            switch (dir) {
-                case move_direction::left:       color = "red"; break;
-                case move_direction::right:      color = "blue"; break;
-                case move_direction::stationary: color = "\"#4c525c\""; break;
-                default:                         color = "black"; break;
+    
+        dot << "digraph TuringMachine {\n";
+        dot << "bgcolor=\"lightyellow\";\n";
+        dot << "  rankdir=LR;\n";
+        dot << "  fontsize=14;\n";
+        dot << "  node [shape=circle, fontname=Helvetica];\n";
+    
+        dot << R"(
+    subgraph cluster_legend {
+        label="Legend";
+        fontsize=15;
+        style=dashed;
+        margin=8;
+        rank=sink;
+    
+        Lmove [label="L = Move Left", shape=plaintext, fontcolor=red];
+        Rmove [label="R = Move Right", shape=plaintext, fontcolor=blue];
+        Smove [label="S = Stay", shape=plaintext, fontcolor="#4c525c"];
+        Curr [label="Current State", shape=circle, style=filled, fillcolor=lightgreen, fontsize=8];
+    
+        // Invisible edges for vertical stacking
+        Lmove -> Rmove [style=invis];
+        Rmove -> Smove [style=invis];
+        Smove -> Curr  [style=invis];
+    }
+    )";
+    
+        for (int f : final_states) {
+            dot << "  " << f << " [shape=doublecircle];\n";
+        }
+    
+        dot << "  start [shape=point];\n";
+        dot << "  start -> " << initial_state << ";\n";
+    
+        // dot << "  " << curr_state << " [style=filled, fillcolor=lightgreen];\n";
+    
+        auto direction_to_string = [](move_direction dir) {
+            switch(dir) {
+                case move_direction::left: return "L";
+                case move_direction::right: return "R";
+                case move_direction::stationary: return "S";
+                default: return "?";
             }
+        };
+    
+        for (int state = 0; state < num_states; ++state) {
+            for (const auto& [read_symbol, trans] : transition_function[state]) {
+                int next_state;
+                char write_symbol;
+                move_direction dir;
+                std::tie(next_state, write_symbol, dir) = trans;
+    
+                std::string color;
+                switch (dir) {
+                    case move_direction::left:       color = "red"; break;
+                    case move_direction::right:      color = "blue"; break;
+                    case move_direction::stationary: color = "\"#4c525c\""; break;
+                    default:                         color = "black"; break;
+                }
 
-            dot << "  " << state << " -> " << next_state
-                << " [label=\""
-                << read_symbol << " → " << write_symbol
-                << "\", color=" << color << "];\n";
+                std::string temp_read_str = {read_symbol};
+                std::string temp_write_str = {write_symbol};
+                std::string temp_blank_str = "□";
+    
+                dot << "  " << state << " -> " << next_state
+                    << " [label=\""
+                    << (read_symbol == blank ? temp_blank_str : temp_read_str) << " → " << (write_symbol == blank ? temp_blank_str : temp_write_str)
+                    << "\", color=" << color << "];\n";
+            }
         }
+    
+        dot << "}\n";
+        dot.close();
+    
+        std::string cmd = "dot -Tdot " + filename + " -o " + DOT_POS_FILE_PATH;
+        system(cmd.c_str());
+        
+        // dot.open(filename);
+        // dot << "  " << curr_state << " [style=filled, fillcolor=lightgreen];\n";
+        // dot.close();
+        export_to_graphviz(filename);
+        
+        // std::string cmd = "dot -Tpng " + filename + " -o " + TM_FA_IMAGE_PATH;
+        // system(cmd.c_str());
     }
+    else{
+        std::ofstream dot(filename);
+        std::ifstream dot_pos(DOT_POS_FILE_PATH);
 
-    dot << "}\n";
-    dot.close();
+        std::string line;
+        while(std::getline(dot_pos, line)){
+            if(line == "}"){
+                dot << "  " << curr_state << " [style=filled, fillcolor=lightgreen];\n";
+            }
+            dot << line << "\n";
+        }
 
-    std::string cmd = "dot -Tpng " + filename + " -o " + TM_FA_IMAGE_PATH;
-    system(cmd.c_str());
+        dot_pos.close();
+        dot.close();
+
+        std::string cmd = "dot -Tpng " + filename + " -o " + TM_FA_IMAGE_PATH;
+        system(cmd.c_str());
+    }
 }
 
 turing_machine read_input_turing_machine(){
