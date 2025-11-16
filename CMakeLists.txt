@@ -5,7 +5,7 @@ project(TM_SIMULATOR)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# replace the path below with the actual path
+# replace the path below with the actual path or add the below variable as an environment variable
 set(SFML_LOCAL_DIR $ENV{SFML_GCC_2.6.2_DIR})
 
 set(SFML_DIR "${SFML_LOCAL_DIR}/lib/cmake/SFML")

@@ -12,7 +12,7 @@ private:
 
 public:
     tape_box();
-    tape_box(const char _text, const sf::Font& _font, const float _xpos, const float _ypos);
+    tape_box(const char _text, const sf::Font& _font, const sf::Texture *_texture, const float _xpos, const float _ypos);
 
     void draw(sf::RenderWindow& _window) const;
     void set_text(const char _text);

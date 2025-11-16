@@ -6,23 +6,24 @@
 #include "simulator.hpp"
 #include "tape_box.hpp"
 
-void simulator::simulate_turing_machine() const{
+bool simulator::simulate_turing_machine() const{
     // std::ifstream turing_machine_file(TM_FILE_PATH);
-    // turing_machine tm(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
-    // tm.add_transition(0, '0', 1, 'x', move_direction::right);
-    // tm.add_transition(0, 'y', 3, 'y', move_direction::right);
-    // tm.add_transition(1, '0', 1, '0', move_direction::right);
-    // tm.add_transition(1, '1', 2, 'y', move_direction::left);
-    // tm.add_transition(1, 'y', 1, 'y', move_direction::right);
-    // tm.add_transition(2, '0', 2, '0', move_direction::left);
-    // tm.add_transition(2, 'x', 0, 'x', move_direction::right);
-    // tm.add_transition(2, 'y', 2, 'y', move_direction::left);
-    // tm.add_transition(3, 'y', 3, 'y', move_direction::right);
-    // tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
+    turing_machine tm(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
+    tm.add_transition(0, '0', 1, 'x', move_direction::right);
+    tm.add_transition(0, 'y', 3, 'y', move_direction::right);
+    tm.add_transition(1, '0', 1, '0', move_direction::right);
+    tm.add_transition(1, '1', 2, 'y', move_direction::left);
+    tm.add_transition(1, 'y', 1, 'y', move_direction::right);
+    tm.add_transition(2, '0', 2, '0', move_direction::left);
+    tm.add_transition(2, 'x', 0, 'x', move_direction::right);
+    tm.add_transition(2, 'y', 2, 'y', move_direction::left);
+    tm.add_transition(3, 'y', 3, 'y', move_direction::right);
+    tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
     // turing_machine tm = get_tm_from_file();
     // turing_machine_file.close();
 
     turing_machine tm = read_turing_machine();
+    tm.export_to_graphviz(DOT_FILE_PATH);
 
     std::ifstream input_string_file(INPUT_STRING_FILE_PATH);
     std::string input_string;
@@ -31,19 +32,37 @@ void simulator::simulate_turing_machine() const{
 
     tm.setup(input_string);
 
+    unsigned fps = 60u;
     sf::RenderWindow simulation_window(sf::VideoMode(1400u, 850u), "Turing Machine Simulator");
-    simulation_window.setFramerateLimit(60);
+    simulation_window.setFramerateLimit(fps);
 
     sf::Font tape_font;
-    if(!tape_font.loadFromFile("../res/fonts/NotoSans_Regular.ttf")){
+    if(!tape_font.loadFromFile(TAPE_FONT_PATH)){
         throw std::runtime_error("Failed to load the tape font");
+    }
+    sf::Texture tape_texture;
+    if(!tape_texture.loadFromFile(TAPE_TEXTURE_PATH)){
+        throw std::runtime_error("Failed to load the tape texture");
+    }
+    sf::Texture tape_center_texture;
+    if(!tape_center_texture.loadFromFile(TAPE_CENTER_TEXTURE_PATH)){
+        throw std::runtime_error("Failed to load the tape center texture");
+    }
+    sf::Texture read_head_texture;
+    if(!read_head_texture.loadFromFile(READ_HEAD_TEXTURE)){
+        throw std::runtime_error("Failed to load the read head texture");
+    }
+    sf::Texture fa_texture;
+    if(!fa_texture.loadFromFile(TM_FA_IMAGE_PATH)){
+        throw std::runtime_error("Failed to load the FA texture");
     }
 
     std::vector<tape_box> tape_boxes;
-    float xpos = 200.0f, ypos = 200.0f;
+    float base_xpos = 200.0f, base_ypos = 100.0f;
+    float xpos = base_xpos, ypos = base_ypos;
     auto mini_tape_contents = tm.get_mini_tape_contents();
     for(int i = 0; i < MINI_TAPE_SIZE; i++){
-        tape_boxes.emplace_back(mini_tape_contents[i], tape_font, xpos, ypos);
+        tape_boxes.emplace_back(mini_tape_contents[i], tape_font, &tape_texture, xpos, ypos);
         xpos += TAPE_BOX_SIZE;
     }
     
@@ -51,27 +70,103 @@ void simulator::simulate_turing_machine() const{
     for(int i = 0; i < 4; i++){
         dummy_boxes.emplace_back(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
         dummy_boxes[i].setOrigin(dummy_boxes[i].getSize() / 2.0f);
+        dummy_boxes[i].setFillColor(BG_COLOR);
     }
-    dummy_boxes[0].setPosition(200.0f, 200.0f);
-    dummy_boxes[1].setPosition(200.0f - TAPE_BOX_SIZE, 200.0f);
-    dummy_boxes[2].setPosition(200.0f + (MINI_TAPE_SIZE - 1) * TAPE_BOX_SIZE, 200.0f);
-    dummy_boxes[3].setPosition(200.0f + MINI_TAPE_SIZE * TAPE_BOX_SIZE, 200.0f);
+    dummy_boxes[0].setPosition(base_xpos, base_ypos);
+    dummy_boxes[1].setPosition(base_xpos - TAPE_BOX_SIZE, base_ypos);
+    dummy_boxes[2].setPosition(base_xpos + (MINI_TAPE_SIZE - 1) * TAPE_BOX_SIZE, base_ypos);
+    dummy_boxes[3].setPosition(base_xpos + MINI_TAPE_SIZE * TAPE_BOX_SIZE, base_ypos);
+
+    sf::RectangleShape center_box(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
+    center_box.setTexture(&tape_center_texture);
+    center_box.setOrigin(center_box.getSize() / 2.0f);
+    center_box.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos);
+
+    sf::RectangleShape read_head(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
+    read_head.setTexture(&read_head_texture);
+    read_head.setOrigin(read_head.getSize() / 2.0f);
+    read_head.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos + TAPE_BOX_SIZE);
+
+    sf::RectangleShape tm_fa(sf::Vector2f(1000.0f, 570.0f));
+    tm_fa.setTexture(&fa_texture);
+    tm_fa.setOrigin(tm_fa.getSize() / 2.0f);
+    tm_fa.setPosition(base_xpos + (MINI_TAPE_SIZE / 2) * TAPE_BOX_SIZE, base_ypos + 450.0f);
+    tm_fa.setOutlineColor(FA_BOX_OUTLINE_COLOR);
+    tm_fa.setOutlineThickness(8.0f);
 
     long long frame_count = -1ll;
     std::tuple<int, char, move_direction> move;
+    bool paused = true;
+    bool verdict_passed = false;
+
+    simulation_window.clear(BG_COLOR);
+    for(auto& box : tape_boxes){
+        box.draw(simulation_window);
+    }
+    for(int i = 0; i < 4; i++){
+        simulation_window.draw(dummy_boxes[i]);
+    }
+    simulation_window.draw(center_box);
+    simulation_window.draw(read_head);
+    simulation_window.draw(tm_fa);
+    simulation_window.display();
 
     while(simulation_window.isOpen()){
-        frame_count++;
-
         sf::Event event;
         
         while(simulation_window.pollEvent(event)){
-            if(event.type == sf::Event::Closed) simulation_window.close();
+            switch(event.type){
+                case sf::Event::EventType::Closed :{
+                    simulation_window.close();
+
+                    break;
+                }
+
+                case sf::Event::EventType::KeyPressed :{
+                    if(event.key.code == sf::Keyboard::P){
+                        paused = (!paused);
+                    }
+                    else if(event.key.code == sf::Keyboard::R){
+                        return true;
+                    }
+                    else if(event.key.code == sf::Keyboard::F){
+                        fps = std::min(180u, fps + 60u);
+                        simulation_window.setFramerateLimit(fps);
+                    }
+                    else if(event.key.code == sf::Keyboard::S){
+                        fps = std::max(60u, fps - 60u);
+                        simulation_window.setFramerateLimit(fps);
+                    }
+                    else if(event.key.code == sf::Keyboard::Escape){
+                        simulation_window.close();
+                    }
+
+                    break;
+                }
+
+                default :{
+                    break;
+                }
+            }
         }
 
-        // for(int i = 0; i < MINI_TAPE_SIZE; i++){
-        //     tape_boxes[i].transform();
-        // }
+        if(paused){
+            simulation_window.clear(BG_COLOR);
+            for(auto& box : tape_boxes){
+                box.draw(simulation_window);
+            }
+            for(int i = 0; i < 4; i++){
+                simulation_window.draw(dummy_boxes[i]);
+            }
+            simulation_window.draw(center_box);
+            simulation_window.draw(read_head);
+            simulation_window.draw(tm_fa);
+            simulation_window.display();
+
+            continue;
+        }
+
+        frame_count++;
 
         if(frame_count % 120 == 0){
             for(int i = 0; i < MINI_TAPE_SIZE; i++){
@@ -84,14 +179,30 @@ void simulator::simulate_turing_machine() const{
 
                 move = tm.make_move();
 
-                xpos = 200.0f;
-                ypos = 200.0f;
+                xpos = base_xpos;
+                ypos = base_ypos;
                 for(int i = 0; i < MINI_TAPE_SIZE; i++){
                     if(i == MINI_TAPE_SIZE / 2) tape_boxes[i].set_text(std::get<char>(move));
                     else tape_boxes[i].set_text(mini_tape_contents[i]);
 
                     tape_boxes[i].set_position(xpos, ypos);
                     xpos += TAPE_BOX_SIZE;
+                }
+
+                tm.export_to_graphviz(DOT_FILE_PATH);
+                if(!fa_texture.loadFromFile(TM_FA_IMAGE_PATH)){
+                    throw std::runtime_error("Failed to load the FA texture");
+                }
+                tm_fa.setTexture(&fa_texture);
+            }
+            else if(!verdict_passed){
+                verdict_passed = true;
+
+                if(tm.accepting()){
+                    std::cout << "Accepted" << std::endl;
+                }
+                else{
+                    std::cout << "Rejected" << std::endl;
                 }
             }
         }
@@ -106,6 +217,10 @@ void simulator::simulate_turing_machine() const{
                     tape_boxes[i].set_velocity(-TAPE_BOX_SIZE / 60, 0.0f);
                 }
             }
+
+            if(tm.halted()){
+                std::get<move_direction>(move) = move_direction::stationary;
+            }
         }
 
         for(int i = 0; i < MINI_TAPE_SIZE; i++){
@@ -119,15 +234,13 @@ void simulator::simulate_turing_machine() const{
         for(int i = 0; i < 4; i++){
             simulation_window.draw(dummy_boxes[i]);
         }
+        simulation_window.draw(center_box);
+        simulation_window.draw(read_head);
+        simulation_window.draw(tm_fa);
         simulation_window.display();
     }
 
-    if(tm.accepting()){
-        std::cout << "Accepted" << std::endl;
-    }
-    else{
-        std::cout << "Rejected" << std::endl;
-    }
-
     input_string_file.close();
+
+    return false;
 }

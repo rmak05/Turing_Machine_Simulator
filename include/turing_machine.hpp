@@ -66,8 +66,8 @@ private:
     bool accepting() const;
     std::tuple<int, char, move_direction> make_move();
     std::array<char, MINI_TAPE_SIZE> get_mini_tape_contents() const;
-    
-    void export_to_graphviz(const std::string& filename) const {};
+
+    void export_to_graphviz(const std::string& filename) const;
 };
 
 turing_machine read_turing_machine();
