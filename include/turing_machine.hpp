@@ -16,8 +16,6 @@ enum class move_direction{
     stationary
 };
 extern const std::set<move_direction> move_direction_set;
-#define BLANK_SYM ' '
-
 
 /*
 Turing Machine:
@@ -70,6 +68,6 @@ private:
     void export_to_graphviz(const std::string& filename) const;
 };
 
-turing_machine read_turing_machine();
+turing_machine read_input_turing_machine();
 
 #endif /* TURING_MACHINE_HPP */

@@ -8,68 +8,6 @@
 
 const std::set<move_direction> move_direction_set = {move_direction::left, move_direction::right, move_direction::stationary};
 
-turing_machine read_turing_machine(){
-    std::ifstream file(TM_FILE_PATH);
-    if (!file) {
-        throw std::runtime_error("Cannot open turing_machine file");
-    }
-    int numStates;
-    file >> numStates;
-
-    std::set<char> alphabets;
-    {
-        std::string line;
-        getline(file, line); // clear leftover newline
-        getline(file, line);
-        std::stringstream ss(line);
-        char x;
-        while (ss >> x) alphabets.insert(x);
-    }
-    std::set<char> tapeAlphabets;
-    {
-        std::string line;
-        getline(file, line);
-        std::stringstream ss(line);
-        char x;
-        while (ss >> x) tapeAlphabets.insert(x);
-    }
-
-    // Adding blank symbol
-    tapeAlphabets.insert(BLANK_SYM);
-
-    int initialState;
-    file >> initialState;
-
-    std::set<int> finalStates;
-    {
-        std::string line;
-        getline(file, line); // clear leftover newline
-        getline(file, line);
-        std::stringstream ss(line);
-        int x;
-        while (ss >> x) finalStates.insert(x);
-    }
-
-    turing_machine tm(numStates, alphabets, tapeAlphabets, initialState, (char)BLANK_SYM, finalStates);
-    {
-        int cs, ns;
-        char rs, ws, dir;
-
-        while (file >> cs >> rs >> ns >> ws >> dir) {
-            char rs_s = (rs == '_' ? BLANK_SYM : rs);
-            char ws_s = (ws == '_' ? BLANK_SYM : ws);
-
-            if(dir == 'L') tm.add_transition(cs, rs_s, ns, ws_s, move_direction::left);
-            else if(dir == 'R') tm.add_transition(cs, rs_s, ns, ws_s, move_direction::right);
-            else if(dir == 'S') tm.add_transition(cs, rs_s, ns, ws_s, move_direction::stationary);
-            else{
-                throw std::runtime_error(std::string("Invlid Read Write Head movement direction in transitions. Possible directions are L: left, R: Right, S: Stationary. Found value: ") + dir);
-            }
-        }
-    }
-    return tm;
-}
-
 turing_machine::turing_machine() :
 num_states(1), tape_alphabet({' '}), initial_state(0), blank(' '), final_states({0}), transition_function(1), curr_state(0), read_head(0), tape({' '}){
     validate_contraints();
@@ -286,4 +224,69 @@ void turing_machine::export_to_graphviz(const std::string& filename) const {
 
     std::string cmd = "dot -Tpng " + filename + " -o " + TM_FA_IMAGE_PATH;
     system(cmd.c_str());
+}
+
+turing_machine read_input_turing_machine(){
+    std::ifstream file(TM_FILE_PATH);
+    if (!file) {
+        throw std::runtime_error("Cannot open turing_machine file");
+    }
+    int numStates;
+    file >> numStates;
+
+    std::set<char> alphabets;
+    {
+        std::string line;
+        getline(file, line); // clear leftover newline
+        getline(file, line);
+        std::stringstream ss(line);
+        char x;
+        while (ss >> x) alphabets.insert(x);
+    }
+    std::set<char> tapeAlphabets;
+    {
+        std::string line;
+        getline(file, line);
+        std::stringstream ss(line);
+        char x;
+        while (ss >> x) tapeAlphabets.insert(x);
+    }
+
+    // Adding blank symbol
+    tapeAlphabets.insert(BLANK_SYM);
+
+    int initialState;
+    file >> initialState;
+
+    std::set<int> finalStates;
+    {
+        std::string line;
+        getline(file, line); // clear leftover newline
+        getline(file, line);
+        std::stringstream ss(line);
+        int x;
+        while (ss >> x) finalStates.insert(x);
+    }
+
+    turing_machine tm(numStates, alphabets, tapeAlphabets, initialState, (char)BLANK_SYM, finalStates);
+    {
+        int cs, ns;
+        char rs, ws, dir;
+
+        while (file >> cs >> rs >> ns >> ws >> dir) {
+            char rs_s = (rs == '_' ? BLANK_SYM : rs);
+            char ws_s = (ws == '_' ? BLANK_SYM : ws);
+
+            if(dir == 'L') tm.add_transition(cs, rs_s, ns, ws_s, move_direction::left);
+            else if(dir == 'R') tm.add_transition(cs, rs_s, ns, ws_s, move_direction::right);
+            else if(dir == 'S') tm.add_transition(cs, rs_s, ns, ws_s, move_direction::stationary);
+            else{
+                throw std::runtime_error(std::string("Invalid Read Write Head movement direction in transitions. Possible directions are - L: left, R: Right, S: Stationary. Found value: ") + dir);
+            }
+        }
+    }
+
+    file.close();
+
+    return tm;
 }

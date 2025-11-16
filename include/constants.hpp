@@ -17,6 +17,7 @@ inline constexpr const char *TM_FA_IMAGE_PATH           = "../output/tm.png";
 
 inline constexpr float TAPE_BOX_SIZE            = 100.0f;
 inline constexpr unsigned TAPE_BOX_TEXT_SIZE    = 45u;
+inline constexpr char BLANK_SYM                 = ' ';
 
 inline const sf::Color BG_COLOR                 = sf::Color(0x99E6FFFF);
 inline const sf::Color TAPE_TEXT_COLOR          = sf::Color(0x442009FF);
