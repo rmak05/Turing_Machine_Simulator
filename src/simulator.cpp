@@ -8,19 +8,21 @@
 
 void simulator::simulate_turing_machine() const{
     // std::ifstream turing_machine_file(TM_FILE_PATH);
-    turing_machine tm(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
-    tm.add_transition(0, '0', 1, 'x', move_direction::right);
-    tm.add_transition(0, 'y', 3, 'y', move_direction::right);
-    tm.add_transition(1, '0', 1, '0', move_direction::right);
-    tm.add_transition(1, '1', 2, 'y', move_direction::left);
-    tm.add_transition(1, 'y', 1, 'y', move_direction::right);
-    tm.add_transition(2, '0', 2, '0', move_direction::left);
-    tm.add_transition(2, 'x', 0, 'x', move_direction::right);
-    tm.add_transition(2, 'y', 2, 'y', move_direction::left);
-    tm.add_transition(3, 'y', 3, 'y', move_direction::right);
-    tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
+    // turing_machine tm(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
+    // tm.add_transition(0, '0', 1, 'x', move_direction::right);
+    // tm.add_transition(0, 'y', 3, 'y', move_direction::right);
+    // tm.add_transition(1, '0', 1, '0', move_direction::right);
+    // tm.add_transition(1, '1', 2, 'y', move_direction::left);
+    // tm.add_transition(1, 'y', 1, 'y', move_direction::right);
+    // tm.add_transition(2, '0', 2, '0', move_direction::left);
+    // tm.add_transition(2, 'x', 0, 'x', move_direction::right);
+    // tm.add_transition(2, 'y', 2, 'y', move_direction::left);
+    // tm.add_transition(3, 'y', 3, 'y', move_direction::right);
+    // tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
     // turing_machine tm = get_tm_from_file();
     // turing_machine_file.close();
+
+    turing_machine tm = read_turing_machine();
 
     std::ifstream input_string_file(INPUT_STRING_FILE_PATH);
     std::string input_string;
