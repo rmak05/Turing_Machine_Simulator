@@ -12,6 +12,7 @@ inline constexpr const char *TAPE_FONT_PATH             = "../res/fonts/NotoSans
 inline constexpr const char *TAPE_TEXTURE_PATH          = "../res/textures/tape_box_3.png";
 inline constexpr const char *TAPE_CENTER_TEXTURE_PATH   = "../res/textures/tape_box_5.png";
 inline constexpr const char *READ_HEAD_TEXTURE          = "../res/textures/read_head_0.png";
+inline constexpr const char *DOT_FILE_PATH              = "tm.dot";
 
 inline constexpr float TAPE_BOX_SIZE            = 100.0f;
 inline constexpr unsigned TAPE_BOX_TEXT_SIZE    = 45u;

@@ -19,6 +19,8 @@ bool simulator::simulate_turing_machine() const{
     tm.add_transition(2, 'y', 2, 'y', move_direction::left);
     tm.add_transition(3, 'y', 3, 'y', move_direction::right);
     tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
+
+    tm.export_to_graphviz(DOT_FILE_PATH);
     // turing_machine tm = get_tm_from_file();
     // turing_machine_file.close();
 
