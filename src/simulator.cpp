@@ -206,13 +206,6 @@ bool simulator::simulate_turing_machine() const{
         simulation_window.display();
     }
 
-    // if(tm.accepting()){
-    //     std::cout << "Accepted" << std::endl;
-    // }
-    // else{
-    //     std::cout << "Rejected" << std::endl;
-    // }
-
     input_string_file.close();
 
     return false;
