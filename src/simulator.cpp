@@ -6,7 +6,7 @@
 #include "simulator.hpp"
 #include "tape_box.hpp"
 
-void simulator::simulate_turing_machine() const{
+bool simulator::simulate_turing_machine() const{
     // std::ifstream turing_machine_file(TM_FILE_PATH);
     turing_machine tm(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
     tm.add_transition(0, '0', 1, 'x', move_direction::right);
@@ -50,7 +50,7 @@ void simulator::simulate_turing_machine() const{
     }
 
     std::vector<tape_box> tape_boxes;
-    float base_xpos = 200.0f, base_ypos = 600.0f;
+    float base_xpos = 200.0f, base_ypos = 100.0f;
     float xpos = base_xpos, ypos = base_ypos;
     auto mini_tape_contents = tm.get_mini_tape_contents();
     for(int i = 0; i < MINI_TAPE_SIZE; i++){
@@ -81,15 +81,55 @@ void simulator::simulate_turing_machine() const{
 
     long long frame_count = -1ll;
     std::tuple<int, char, move_direction> move;
+    bool paused = true;
+
+    simulation_window.clear(BG_COLOR);
+    for(auto& box : tape_boxes){
+        box.draw(simulation_window);
+    }
+    for(int i = 0; i < 4; i++){
+        simulation_window.draw(dummy_boxes[i]);
+    }
+    simulation_window.draw(center_box);
+    simulation_window.draw(read_head);
+    simulation_window.display();
 
     while(simulation_window.isOpen()){
-        frame_count++;
-
         sf::Event event;
         
         while(simulation_window.pollEvent(event)){
-            if(event.type == sf::Event::Closed) simulation_window.close();
+            switch(event.type){
+                case sf::Event::EventType::Closed :{
+                    simulation_window.close();
+
+                    break;
+                }
+
+                case sf::Event::EventType::KeyPressed :{
+                    if(event.key.code == sf::Keyboard::P){
+                        paused = (!paused);
+                    }
+                    else if(event.key.code == sf::Keyboard::R){
+                        return true;
+                    }
+                    else if(event.key.code == sf::Keyboard::Escape){
+                        simulation_window.close();
+                    }
+
+                    break;
+                }
+
+                default :{
+                    break;
+                }
+            }
         }
+
+        if(paused){
+            continue;
+        }
+
+        frame_count++;
 
         // for(int i = 0; i < MINI_TAPE_SIZE; i++){
         //     tape_boxes[i].transform();
@@ -154,4 +194,6 @@ void simulator::simulate_turing_machine() const{
     }
 
     input_string_file.close();
+
+    return false;
 }
