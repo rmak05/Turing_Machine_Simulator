@@ -7,19 +7,6 @@
 #include "tape_box.hpp"
 
 bool simulator::simulate_turing_machine() const{
-    // turing_machine tm(5, {'0', '1'}, {'0', '1', 'x', 'y', ' '}, 0, ' ', {4});
-    // tm.add_transition(0, '0', 1, 'x', move_direction::right);
-    // tm.add_transition(0, 'y', 3, 'y', move_direction::right);
-    // tm.add_transition(1, '0', 1, '0', move_direction::right);
-    // tm.add_transition(1, '1', 2, 'y', move_direction::left);
-    // tm.add_transition(1, 'y', 1, 'y', move_direction::right);
-    // tm.add_transition(2, '0', 2, '0', move_direction::left);
-    // tm.add_transition(2, 'x', 0, 'x', move_direction::right);
-    // tm.add_transition(2, 'y', 2, 'y', move_direction::left);
-    // tm.add_transition(3, 'y', 3, 'y', move_direction::right);
-    // tm.add_transition(3, ' ', 4, ' ', move_direction::stationary);
-    // turing_machine tm = get_tm_from_file();
-
     turing_machine tm = read_input_turing_machine();
 
     tm.export_to_graphviz(DOT_FILE_PATH);
@@ -56,6 +43,8 @@ bool simulator::simulate_turing_machine() const{
         throw std::runtime_error("Failed to load the FA texture");
     }
 
+    sf::Color curr_bg_color = BG_NEUTRAL_COLOR;
+
     std::vector<tape_box> tape_boxes;
     float base_xpos = 200.0f, base_ypos = 100.0f;
     float xpos = base_xpos, ypos = base_ypos;
@@ -69,7 +58,7 @@ bool simulator::simulate_turing_machine() const{
     for(int i = 0; i < 4; i++){
         dummy_boxes.emplace_back(sf::Vector2f(TAPE_BOX_SIZE, TAPE_BOX_SIZE));
         dummy_boxes[i].setOrigin(dummy_boxes[i].getSize() / 2.0f);
-        dummy_boxes[i].setFillColor(BG_COLOR);
+        dummy_boxes[i].setFillColor(curr_bg_color);
     }
     dummy_boxes[0].setPosition(base_xpos, base_ypos);
     dummy_boxes[1].setPosition(base_xpos - TAPE_BOX_SIZE, base_ypos);
@@ -98,7 +87,7 @@ bool simulator::simulate_turing_machine() const{
     bool paused = true;
     bool verdict_passed = false;
 
-    simulation_window.clear(BG_COLOR);
+    simulation_window.clear(curr_bg_color);
     for(auto& box : tape_boxes){
         box.draw(simulation_window);
     }
@@ -150,7 +139,7 @@ bool simulator::simulate_turing_machine() const{
         }
 
         if(paused){
-            simulation_window.clear(BG_COLOR);
+            simulation_window.clear(curr_bg_color);
             for(auto& box : tape_boxes){
                 box.draw(simulation_window);
             }
@@ -198,10 +187,18 @@ bool simulator::simulate_turing_machine() const{
                 verdict_passed = true;
 
                 if(tm.accepting()){
+                    curr_bg_color = BG_ACCEPTED_COLOR;
+
                     std::cout << "Accepted" << std::endl;
                 }
                 else{
+                    curr_bg_color = BG_REJECTED_COLOR;
+
                     std::cout << "Rejected" << std::endl;
+                }
+
+                for(int i = 0; i < 4; i++){
+                    dummy_boxes[i].setFillColor(curr_bg_color);
                 }
             }
         }
@@ -226,7 +223,7 @@ bool simulator::simulate_turing_machine() const{
             tape_boxes[i].transform();
         }
 
-        simulation_window.clear(BG_COLOR);
+        simulation_window.clear(curr_bg_color);
         for(auto& box : tape_boxes){
             box.draw(simulation_window);
         }

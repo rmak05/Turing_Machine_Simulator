@@ -51,6 +51,8 @@ private:
     std::deque<char>                    tape;
     int                                 read_head;
 
+    bool                                extracted_to_dot;
+
     void validate_contraints();
     
     public:
@@ -65,7 +67,7 @@ private:
     std::tuple<int, char, move_direction> make_move();
     std::array<char, MINI_TAPE_SIZE> get_mini_tape_contents() const;
 
-    void export_to_graphviz(const std::string& filename) const;
+    void export_to_graphviz(const std::string& filename);
 };
 
 turing_machine read_input_turing_machine();
