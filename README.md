@@ -35,6 +35,8 @@ Each transition follows the rule:
 δ(current_state, read_symbol) → (next_state, write_symbol, direction)
 ```
 
+![TM Diagram](snapshots/diagram.jpg)
+
 ### **Deterministic Turing Machine**
 
 In a DTM:
@@ -47,7 +49,7 @@ In a DTM:
 
 The tape is implemented using a dynamically expandable deque, allowing infinite extension on both sides.
 
-### **3.4 Move Directions**
+### **Move Directions**
 
 Supported directions:
 
@@ -55,7 +57,7 @@ Supported directions:
 * `R` → Right
 * `S` → Stationary
 
-### **3.5 GraphViz Diagram Generation**
+### **GraphViz Diagram Generation**
 
 The simulator exports the transition diagram as a DOT file:
 
@@ -66,7 +68,7 @@ The simulator exports the transition diagram as a DOT file:
 
 ## **🧱 System Architecture**
 
-### **4.1 `turing_machine` Class**
+### **`turing_machine` Class**
 
 Handles:
 
@@ -75,23 +77,24 @@ Handles:
 * Simulation logic
 * DOT export for visualization
 
-### **4.2 Simulation Pipeline**
+### **Simulation Pipeline**
 
 1. Load machine description
 2. Initialize tape with input
 3. Loop through:
-
    * Read symbol
    * Determine next transition
    * Write symbol
    * Move head
    * Change state
+   ![Executing State](snapshots/running.png)
 4. Halt when:
-
    * Transition doesn’t exist
+   ![Rejected State](snapshots/rejected.png)
    * State is accepting
+   ![Accepted State](snapshots/accepted.png)
 
-### **4.3 Error Handling**
+### **Error Handling**
 
 The simulator checks for:
 
@@ -149,6 +152,14 @@ It provides a strong foundation for learning Automata Theory and can be extended
 ---
 
 ## **🛠 Setup**
+
+**Currently this project is supported for Windows operating system only.**
+
+Install and setup the following :
+- GCC
+- CMAKE
+- GRAPHVIZ
+- SFML
 
 Either add a system variable named `SFML_GCC_2.6.2_DIR` pointing to the SFML directory
 **OR** modify the `CMakeLists.txt` file:
