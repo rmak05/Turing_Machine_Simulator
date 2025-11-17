@@ -24,7 +24,7 @@ bgcolor="lightyellow";
   4 [shape=doublecircle];
   start [shape=point];
   start -> 0;
-  4 [style=filled, fillcolor=lightgreen];
+  2 [style=filled, fillcolor=lightgreen];
   0 -> 1 [label="0 → x", color=blue];
   0 -> 3 [label="y → y", color=blue];
   1 -> 1 [label="0 → 0", color=blue];
